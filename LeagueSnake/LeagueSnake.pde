@@ -4,6 +4,14 @@
 //*
 
 class Segment {
+  int x;
+  int y;
+  
+  Segment(int x, int y){
+    this.x = x;
+    this.y = y;
+    
+  }
 
 //Add x and y member variables. They will hold the corner location of each segment of the snake.
 
@@ -19,8 +27,11 @@ class Segment {
 // ***** GAME VARIABLES *****
 // All the game variables that will be shared by the game methods are here
 //*
-
-
+Segment snek;
+int foodX;
+int foodY;
+int foodEaten;
+int direction;
 
 
 
@@ -30,12 +41,18 @@ class Segment {
 //*
 
 void setup() {
-
+  size(500,500);
+  background(90,60,40);
+  snek = new Segment(20,20);
+  frameRate(20);
+  dropFood();
+  direction = UP;
 }
 
 void dropFood() {
   //Set the food in a new random location
-    
+    foodX = ((int)random(50)*10);
+    foodY = ((int)random(50)*10);
 }
 
 
@@ -46,16 +63,40 @@ void dropFood() {
 //*
 
 void draw() {
-  
+  background(90,60,40);
+  drawFood();
+  drawSnake();
 }
 
 void drawFood() {
   //Draw the food
-  
+  noStroke();
+  fill(150,150,150);
+  circle(foodX+5,foodY+5,15);
+  fill(0,0,0);
+  circle(foodX+1,foodY+1,3);
+  circle(foodX+9,foodY+1,3);
+  fill(250,150,170);
+  circle(foodX+5,foodY-1,3);
+  stroke(250,150,170);
+  strokeWeight(3);
+  line(foodX+5,foodY+13,foodX+5,foodY+16);
 }
 
 void drawSnake() {
   //Draw the head of the snake followed by its tail
+  noStroke();
+  fill(0,200,70);
+  rect(snek.x,snek.y,10,10);
+  stroke(250,150,150);
+  strokeWeight(2);
+  line(snek.x+5,snek.y,snek.x+5,snek.y-5);
+  line(snek.x+5,snek.y-5,snek.x+7,snek.y-8);
+  line(snek.x+5,snek.y-5,snek.x+3,snek.y-8);
+  noStroke();
+  fill(0,0,0);
+  circle(snek.x+1,snek.y+3,3);
+  circle(snek.x+9,snek.y+3,3);
 }
 
 
@@ -89,12 +130,27 @@ void checkTailCollision() {
 
 void keyPressed() {
   //Set the direction of the snake according to the arrow keys pressed
+  if(keyCode == UP && direction != DOWN){
+    direction = UP;
+  }
   
+  if(keyCode == DOWN && direction != UP){
+    direction = DOWN;
+  }
 }
 
 void move() {
   //Change the location of the Snake head based on the direction it is moving.
   
+  if(direction==UP){
+    snek.y-=10;
+  } else if(direction==DOWN){
+    snek.y+=10;
+  } else if(direction==LEFT){
+    snek.x-=10;
+  } else if(direction==RIGHT){
+    snek.x+=10;
+  }
     /*
   switch(direction) {
   case UP:
@@ -115,6 +171,18 @@ void move() {
 
 void checkBoundaries() {
  //If the snake leaves the frame, make it reappear on the other side
+ if(snek.x<0){
+   snek.x=500;
+ }
+ if(snek.x>500){
+   snek.x=0;
+ }
+ if(snek.y<0){
+   snek.y=500;
+ }
+ if(snek.y>500){
+   snek.y=0;
+ }
  
 }
 
