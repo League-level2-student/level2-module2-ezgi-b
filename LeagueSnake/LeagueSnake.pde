@@ -32,7 +32,7 @@ int foodX;
 int foodY;
 int foodEaten;
 int direction;
-
+ArrayList<Segment> segments = new ArrayList<Segment>();
 
 
 //*
@@ -43,10 +43,11 @@ int direction;
 void setup() {
   size(500,500);
   background(90,60,40);
-  snek = new Segment(20,20);
-  frameRate(20);
+  snek = new Segment(100,100);
+  frameRate(8);
   dropFood();
   direction = UP;
+  foodEaten = 1;
 }
 
 void dropFood() {
@@ -64,15 +65,18 @@ void dropFood() {
 
 void draw() {
   background(90,60,40);
+  move();
+  checkBoundaries();
   drawFood();
   drawSnake();
+  eat();
 }
 
 void drawFood() {
   //Draw the food
   noStroke();
   fill(150,150,150);
-  circle(foodX+5,foodY+5,15);
+  rect(foodX,foodY,10,10);
   fill(0,0,0);
   circle(foodX+1,foodY+1,3);
   circle(foodX+9,foodY+1,3);
@@ -80,23 +84,15 @@ void drawFood() {
   circle(foodX+5,foodY-1,3);
   stroke(250,150,170);
   strokeWeight(3);
-  line(foodX+5,foodY+13,foodX+5,foodY+16);
+  line(foodX+5,foodY+8,foodX+5,foodY+10);
 }
 
 void drawSnake() {
   //Draw the head of the snake followed by its tail
-  noStroke();
-  fill(0,200,70);
-  rect(snek.x,snek.y,10,10);
-  stroke(250,150,150);
-  strokeWeight(2);
-  line(snek.x+5,snek.y,snek.x+5,snek.y-5);
-  line(snek.x+5,snek.y-5,snek.x+7,snek.y-8);
-  line(snek.x+5,snek.y-5,snek.x+3,snek.y-8);
-  noStroke();
-  fill(0,0,0);
-  circle(snek.x+1,snek.y+3,3);
-  circle(snek.x+9,snek.y+3,3);
+    noStroke();
+    fill(0,200,70);
+    rect(snek.x,snek.y,10,10);
+   manageTail();
 }
 
 
@@ -107,18 +103,32 @@ void drawSnake() {
 
 void drawTail() {
   //Draw each segment of the tail 
-
+  for(Segment i: segments){
+    fill(0,200,70);
+    rect(i.x,i.y,10,10);
+  }
 }
 
 void manageTail() {
   //After drawing the tail, add a new segment at the "start" of the tail and remove the one at the "end" 
   //This produces the illusion of the snake tail moving.
+  if(foodEaten>1){
+    checkTailCollision();
+    drawTail();
+    segments.remove(segments.size()-1);
+    segments.add(new Segment(snek.x,snek.y));
+  }
   
 }
 
 void checkTailCollision() {
   //If the snake crosses its own tail, shrink the tail back to one segment
-  
+  for(Segment i: segments){
+    if(i.x==snek.x && i.y==snek.y){
+      foodEaten = 1;
+      segments = new ArrayList<Segment>();
+    }
+  }
 }
 
 
@@ -136,6 +146,14 @@ void keyPressed() {
   
   if(keyCode == DOWN && direction != UP){
     direction = DOWN;
+  }
+  
+  if(keyCode == RIGHT && direction != LEFT){
+    direction = RIGHT;
+  }
+  
+  if(keyCode == LEFT && direction != RIGHT){
+    direction = LEFT;
   }
 }
 
@@ -184,11 +202,21 @@ void checkBoundaries() {
    snek.y=0;
  }
  
+
+ 
 }
 
 
 
 void eat() {
   //When the snake eats the food, its tail should grow and more food appear
+  
+  if(snek.x==foodX && snek.y==foodY){
+    foodEaten+=1;
+    dropFood();
+    segments.add(new Segment(snek.x,snek.y));
+  }
+  
+ 
 
 }
